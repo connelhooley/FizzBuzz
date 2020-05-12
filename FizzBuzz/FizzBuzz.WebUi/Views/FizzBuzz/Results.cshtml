@@ -1,0 +1,70 @@
+﻿@using FizzBuzz.Domain.Models
+@model FizzBuzz.WebUi.ViewModels.FizzBuzz.FizzBuzzViewModel
+
+@using (Html.BeginForm("Results", "FizzBuzz", FormMethod.Get))
+{
+    @Html.TextBoxFor(m => m.MaxValue, new {type="number", placeholder="Enter max value", autocomplete = "off", autofocus="" })
+    @Html.ValidationMessageFor(m => m.MaxValue, null, new { id="max-value-error", @class="error"})
+    <input type="submit" value="Submit" />
+}
+@if (Model.FizzBuzzItems.Any())
+{
+    <div id="results">
+        <div id="description">Showing @Model.FizzWord @Model.BuzzWord sequence up to: <b id="current-max-value">@Model.MaxValue</b></div>
+        <ul id="items">
+            @foreach (var (number, type) in Model.FizzBuzzItems)
+            {
+                <li class="item">
+                    @switch (type)
+                    {
+                        case FizzBuzzType.Fizz:
+                            <span class="fizz">@Model.FizzWord</span>
+                            break;
+                        case FizzBuzzType.Buzz:
+                            <span class="buzz">@Model.BuzzWord</span>
+                            break;
+                        case FizzBuzzType.FizzBuzz:
+                            <span class="fizz">@Model.FizzWord</span>@Html.Raw("&nbsp;")<span class="buzz">@Model.BuzzWord</span>
+                            break;
+                        default:
+                            @number
+                            break;
+                    }
+                </li>
+            }
+        </ul>
+        @if (Model.HasNextPage || Model.HasPreviousPage)
+        {
+            <div class="pager">
+                <div class="current-page">
+                    Current page: <b class="current-page-number">@Model.PageNumber</b>
+                </div>
+                @if (Model.HasNextPage || Model.HasPreviousPage)
+                {
+                    <div class="page-links">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <a class="previous-page" href="@Url.Action("Results", "FizzBuzz", new {MaxValue = Model.MaxValue, PageNumber = Model.PageNumber - 1})">
+                                &#xab;&nbsp;Previous page
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="previous-page disabled">&#xab; Previous page</div>
+                        }
+                        @if (Model.HasNextPage)
+                        {
+                            <a class="next-page" href="@Url.Action("Results", "FizzBuzz", new {MaxValue = Model.MaxValue, PageNumber = Model.PageNumber + 1})">
+                                Next page&nbsp;&#xbb;
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="next-page disabled">&#xab; Next page</div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
